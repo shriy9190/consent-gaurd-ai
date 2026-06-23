@@ -21,11 +21,11 @@ Hidden inside those walls of text:
 
 ## ✨ What It Does
 
-- 🔍 **Auto-detects** privacy policies on any website you visit
-- 🧠 **Analyzes** the full text using NLP in real time
-- 🚦 **Risk Score** — 0 to 100, color-coded (green / yellow / red)
-- 📋 **Plain-language summary** — what the policy actually says
-- ⚠️ **Flags dangerous clauses** — data selling, third-party sharing, no deletion rights, and more
+-  **Auto-detects** privacy policies on any website you visit
+-  **Analyzes** the full text using NLP in real time
+-  **Risk Score** — 0 to 100, color-coded (green / yellow / red)
+-  **Plain-language summary** — what the policy actually says
+-  **Flags dangerous clauses** — data selling, third-party sharing, no deletion rights, and more
 
 ---
 
