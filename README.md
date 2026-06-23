@@ -92,11 +92,11 @@ python app.py
 
 | Member | Role |
 |--------|------|
-| Shreya | Backend — NLP Analysis Engine & Flask API |
-| Bhaavika Bhati | Frontend — Browser Extension & UI |
-| Vaishnavi | Integration, Testing & Demo |
+| Vaishnavi bhardwaj | Backend — NLP Analysis Engine & Flask API |
+| Bhavika Bhati | Frontend — Browser Extension & UI |
+| Shreya Singh | Integration, Testing & Demo |
 
----
+---s
 
 ## 🏆 Built For
 
