@@ -1,4 +1,4 @@
-# consent-gaurd-ai
+# consent-guard-ai
 # 🛡️ ConsentGuard AI
 
 > **Your privacy, decoded in seconds.**  
