@@ -6,7 +6,7 @@
 
 ---
 
-## 🚨 The Problem.
+## 🚨 The Problem
 
 Every time you sign up for a new service, you're handed a 10,000-word privacy policy written by lawyers, for lawyers. Nobody reads it. Companies know that.
 
