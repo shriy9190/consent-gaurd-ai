@@ -269,9 +269,9 @@ Important rules:
 
     try:
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",  # fast, capable open model hosted by Groq
-            temperature=0.1,   # low = gives consistent, factual answers (not creative)
-            max_tokens=1000,   # max length of the model's reply
+            model="llama-3.3-70b-versatile",  
+            temperature=0.1,   
+            max_tokens=1000,   
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user",   "content": user_message}
@@ -280,22 +280,18 @@ Important rules:
     except Exception as error:
         raise RuntimeError(f"Groq API call failed: {error}")
 
-    # Get the text the model replied with
+
     raw_reply = response.choices[0].message.content.strip()
 
-    # Sometimes the model wraps JSON in ```json ... ``` markdown — remove that
+    
     clean_reply = re.sub(r"```(?:json)?|```", "", raw_reply).strip()
 
-    # Convert the JSON text into a Python dict
+    
     try:
         parsed = json.loads(clean_reply)
     except json.JSONDecodeError as error:
         log.error(f"Groq returned bad JSON: {raw_reply}")
         raise RuntimeError(f"Could not parse Groq response: {error}")
-
-    # Groq can return syntactically valid JSON that's still missing
-    # keys we expect (e.g. it forgot "positive_points"). Fill in safe
-    # defaults rather than letting a KeyError bubble up later.
     parsed.setdefault("summary", "")
     parsed.setdefault("flags", [])
     parsed.setdefault("categories", {})
