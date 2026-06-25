@@ -1,4 +1,4 @@
-from chromadb.config import Setting
+from chromadb.config import Settings 
 import chromadb
 import json
 import hashlib
