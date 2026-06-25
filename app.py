@@ -1,179 +1,150 @@
-"""
-ConsentGuard-AI Backend
-Steps 1-10: Flask API, scraping, chunking, scoring, ChromaDB caching (via cache_handler.py), history
-"""
+
+import os
+import logging
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import requests
-from bs4 import BeautifulSoup
-import re
+from dotenv import load_dotenv
 
-# Her ChromaDB caching module (Step 7 + 8 - already built)
-from cache_handler import check_cache, save_cache, clear_cache, get_cache_stats
 
-# ---------------------------------------------------------
-# STEP 1: Flask app setup
-# ---------------------------------------------------------
+load_dotenv()
+
+import ai_helper
+import cache
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
+log = logging.getLogger(__name__)
+# SECTION 1 — FLASK APP SETUP
+
+
 app = Flask(__name__)
+
+
+app.config["MAX_CONTENT_LENGTH"] = 2 * 1024 * 1024  # 2 MB
+
+
 CORS(app)
 
-
-# ---------------------------------------------------------
-# STEP 3: Scraping / cleaning policy text from a URL
-# ---------------------------------------------------------
-def scrape_policy_text(url: str) -> str:
-    """Fetch and clean privacy policy text from a URL."""
-    headers = {"User-Agent": "Mozilla/5.0 (ConsentGuard-AI Bot)"}
-    response = requests.get(url, headers=headers, timeout=10)
-    response.raise_for_status()
-
-    soup = BeautifulSoup(response.text, "html.parser")
-    for tag in soup(["script", "style", "nav", "footer", "header", "noscript"]):
-        tag.decompose()
-
-    text = soup.get_text(separator=" ")
-    text = re.sub(r"\s+", " ", text).strip()
-    return text
+APP_API_KEY = os.getenv("APP_API_KEY")
 
 
-# ---------------------------------------------------------
-# STEP 4: Chunking text into clause-sized pieces
-# ---------------------------------------------------------
-def chunk_text(text: str, min_len: int = 40) -> list:
-    raw_sentences = re.split(r'(?<=[.!?])\s+', text)
-    chunks = [s.strip() for s in raw_sentences if len(s.strip()) >= min_len]
-    return chunks
+
+# SECTION 2 — HELPER FUNCTIONS
+
+def is_authorized(req):
+    # If APP_API_KEY isn't set, skip the check (useful for local
+    # dev so you don't have to configure it immediately).
+    if not APP_API_KEY:
+        return True
+    return req.headers.get("X-API-Key") == APP_API_KEY
 
 
-# ---------------------------------------------------------
-# STEP 5: AI/ML classification - now wired in from ml_model.py
-# ---------------------------------------------------------
-from ml_model import classify_clause, classify_all_chunks
+
+# SECTION 3 — ROUTES
 
 
-# ---------------------------------------------------------
-# STEP 6: Exposure Score formula
-# NOTE: matching her scale here - score out of 10, not 0-100,
-# since her cache_handler buckets risk as >=7 high, 4-6 medium, 1-3 low
-# ---------------------------------------------------------
-SEVERITY_WEIGHTS = {"low": 1, "medium": 3, "high": 6, "ambiguous": 2}
+@app.route("/api/health", methods=["GET"])
+def health_check():
+   
+    return jsonify({"status": "ok"}), 200
 
 
-def calculate_exposure_score(classified_clauses: list) -> float:
-    """Returns a score on a 0-10 scale to match cache_handler's bucket thresholds."""
-    if not classified_clauses:
-        return 0.0
-
-    total_weight = sum(
-        SEVERITY_WEIGHTS.get(c["severity"], 2) * c.get("confidence", 0.5)
-        for c in classified_clauses
-    )
-    max_possible = len(classified_clauses) * SEVERITY_WEIGHTS["high"]
-    raw_score = (total_weight / max_possible) * 10  # scaled to 0-10
-    return round(min(raw_score, 10), 1)
-
-
-def get_risk_level(score: float) -> str:
-    if score >= 7:
-        return "HIGH"
-    elif score >= 4:
-        return "MEDIUM"
-    elif score >= 1:
-        return "LOW"
-    return "MINIMAL"
-
-
-def get_flags(classified_clauses: list, n: int = 3) -> list:
-    """Top n highest-risk clauses, used as 'flags' to match her metadata shape."""
-    sorted_clauses = sorted(
-        classified_clauses,
-        key=lambda c: SEVERITY_WEIGHTS.get(c["severity"], 2) * c.get("confidence", 0.5),
-        reverse=True
-    )
-    return sorted_clauses[:n]
-
-
-# ---------------------------------------------------------
-# STEP 2 + 9: Main /analyze route
-# ---------------------------------------------------------
-@app.route('/analyze', methods=['POST'])
+@app.route("/api/analyze", methods=["POST"])
 def analyze():
-    data = request.get_json(silent=True) or {}
-    text_input = data.get('text')
-    url_input = data.get('url')
+   
 
-    if not text_input and not url_input:
-        return jsonify({"error": "No text or URL provided"}), 400
 
-    # Step 8: check cache first (only works for URL input, since cache is keyed by URL)
-    if url_input:
-        cached = check_cache(url_input)
-        if cached:
-            cached["cached"] = True
-            return jsonify(cached)
+    # ── Step 0: Check the API key ─────────────────────────
+    if not is_authorized(request):
+        return jsonify({"error": "Unauthorized"}), 401
 
-    # Step 3: scrape if URL given
+    # ── Step 1: Parse and validate the request body ──────
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({"error": "Request body must be JSON"}), 400
+
+    url = (data.get("url") or "").strip()
+    raw_text = data.get("text") or ""
+
+    if not url:
+        return jsonify({"error": "Missing 'url' field"}), 400
+    if not raw_text.strip():
+        return jsonify({"error": "Missing 'text' field"}), 400
+
+    
+    MAX_TEXT_LENGTH = 300_000
+    if len(raw_text) > MAX_TEXT_LENGTH:
+        raw_text = raw_text[:MAX_TEXT_LENGTH]
+        log.info(f"Truncated oversized text for {url} to {MAX_TEXT_LENGTH} chars")
+
+    log.info(f"Analyze request for: {url}")
+
+    # ── Step 2: Check the cache first ─────────────────────
+    
+    cached_result = cache.get_cached_result(url)
+    if cached_result:
+        log.info(f"Cache hit — skipping AI for {url}")
+        return jsonify({**cached_result, "cached": True}), 200
+
+    # ── Step 3: Cache miss — run the real AI pipeline ─────
+    log.info(f"Cache miss — running AI pipeline for {url}")
     try:
-        policy_text = scrape_policy_text(url_input) if url_input else text_input
-    except Exception as e:
-        return jsonify({"error": f"Failed to fetch policy: {str(e)}"}), 500
+        result = ai_helper.analyze_policy(raw_text)
+    except ValueError as error:
+        # Bad input (e.g. empty text after cleaning)
+        return jsonify({"error": str(error)}), 400
+    except RuntimeError as error:
+        # An API call (Groq/HuggingFace) failed
+        log.error(f"AI pipeline failed for {url}: {error}")
+        return jsonify({"error": "Analysis failed. Please try again."}), 502
+    except Exception as error:
+        # Anything else unexpected
+        log.error(f"Unexpected error analyzing {url}: {error}")
+        return jsonify({"error": "Something went wrong."}), 500
 
-    if not policy_text or len(policy_text) < 20:
-        return jsonify({"error": "Policy text too short or empty"}), 400
+    # ── Step 4: Save to cache for next time ───────────────
+    cleaned_text = ai_helper.clean_text(raw_text)
+    cache.save_result(url, cleaned_text, result)
 
-    # Step 4: chunk
-    chunks = chunk_text(policy_text)
-    if not chunks:
-        return jsonify({"error": "Could not extract clauses from policy"}), 400
-
-    # Step 5: classify (teammate's function)
-    classified = classify_all_chunks(chunks)
-
-    # Step 6: score (matches her 0-10 scale + "flags" naming)
-    score = calculate_exposure_score(classified)
-    level = get_risk_level(score)
-    flags = get_flags(classified)
-
-    result = {
-        "score": score,
-        "level": level,
-        "flags": flags,
-        "full_breakdown": classified,
-        "cached": False
-    }
-
-    # Step 7: save to cache (only if URL was given - her cache is URL-keyed)
-    if url_input:
-        save_cache(url_input, result)
-
-    return jsonify(result)
+    # ── Step 5: Return the result ─────────────────────────
+    return jsonify({**result, "cached": False}), 200
 
 
-# ---------------------------------------------------------
-# STEP 10: History / stats route
-# NOTE: her cache has no per-user tracking (URL-keyed only),
-# so this returns global cache stats, not a specific user's history
-# ---------------------------------------------------------
-@app.route('/history', methods=['GET'])
-def history():
-    stats = get_cache_stats()
-    return jsonify({"cache_stats": stats})
+@app.route("/api/cache/stats", methods=["GET"])
+def cache_stats():
+    
+    if not is_authorized(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    return jsonify(cache.get_cache_stats()), 200
 
 
-@app.route('/cache/clear', methods=['POST'])
+@app.route("/api/cache/clear", methods=["POST"])
 def cache_clear():
-    cleared = clear_cache()
-    return jsonify({"cleared_entries": cleared})
+    
+    if not is_authorized(request):
+        return jsonify({"error": "Unauthorized"}), 401
+    cleared = cache.clear_cache()
+    return jsonify({"cleared": cleared}), 200
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({"error": "Endpoint not found"}), 404
 
 
-# ---------------------------------------------------------
-# Health check
-# ---------------------------------------------------------
-@app.route('/health', methods=['GET'])
-def health():
-    return jsonify({"status": "ok"})
+@app.errorhandler(405)
+def method_not_allowed(error):
+    return jsonify({"error": "Method not allowed"}), 405
 
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+@app.errorhandler(413)
+def payload_too_large(error):
+    return jsonify({"error": "Request body too large"})
+
+if __name__ == "__main__":
+    
+    port = int(os.getenv("PORT", 5000))
+    debug_mode = os.getenv("FLASK_DEBUG", "false").lower() == "true"
+    app.run(host="0.0.0.0", port=port, debug=debug_mode)
