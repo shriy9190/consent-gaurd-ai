@@ -47,24 +47,9 @@ def chunk_text(text: str, min_len: int = 40) -> list:
 
 
 # ---------------------------------------------------------
-# STEP 5: AI/ML classification (built by teammate - import her real function here)
-# Replace this stub with: from ml_model import classify_clause
+# STEP 5: AI/ML classification - now wired in from ml_model.py
 # ---------------------------------------------------------
-def classify_clause(clause: str) -> dict:
-    """
-    STUB - replace with teammate's actual function.
-    """
-    return {
-        "clause": clause[:150],
-        "category": "data_collection_scope",
-        "severity": "medium",
-        "confidence": 0.75,
-        "plain_explanation": "Placeholder explanation - swap in real model output."
-    }
-
-
-def classify_all_chunks(chunks: list) -> list:
-    return [classify_clause(chunk) for chunk in chunks]
+from ml_model import classify_clause, classify_all_chunks
 
 
 # ---------------------------------------------------------
