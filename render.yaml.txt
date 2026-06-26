@@ -2,7 +2,7 @@
 
 services:
   - type: web
-    name: privacyguard-backend
+    name: consentguard_Ai
     runtime: python
     plan: free                     
     buildCommand: pip install -r requirements.txt
