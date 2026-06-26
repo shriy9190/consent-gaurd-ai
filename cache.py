@@ -3,6 +3,7 @@ import chromadb
 import json
 import hashlib
 import os
+os.environ["ANONYMIZED_TELEMETRY"] = "FALSE"
 from datetime import datetime
 
 DBpath = os.getenv("CHROMA_DB_PATH", "./.chroma_db")
