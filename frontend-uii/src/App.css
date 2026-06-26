@@ -30,16 +30,25 @@ body {
 }
 
 .risk-circle {
-  width: 140px;
-  height: 140px;
-  background: #ef4444;
+  width: 150px;
+  height: 150px;
+  margin: 20px auto;
   border-radius: 50%;
-  margin: 15px auto;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 32px;
+  font-size: 34px;
   font-weight: bold;
+  color: white;
+
+  background: conic-gradient(
+    #22c55e 0deg 120deg,
+    #facc15 120deg 240deg,
+    #ef4444 240deg 360deg
+  );
+
+  box-shadow:
+      0 0 30px rgba(239,68,68,.4);
 }
 
 .risks,

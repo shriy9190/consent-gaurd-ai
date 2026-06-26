@@ -25,7 +25,17 @@ function App() {
         <p>⚠ Third-Party Sharing</p>
         <p>⚠ Long-Term Data Storage</p>
       </div>
+      <div className="summary">
+  <h4>Smart Summary</h4>
 
+  <p>
+    This website requests your location,
+    may share data with third parties,
+    and stores information for a long time.
+  </p>
+</div>
+
+      
       <div className="recommendation">
         <h4>Recommendation</h4>
 

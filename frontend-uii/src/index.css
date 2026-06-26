@@ -109,3 +109,19 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+.summary {
+  background: #334155;
+  padding: 15px;
+  border-radius: 12px;
+  margin-top: 15px;
+}
+
+.summary h4 {
+  color: white;
+  margin-bottom: 10px;
+}
+
+.summary p {
+  color: white;
+  line-height: 1.5;
+}
