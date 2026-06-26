@@ -1,6 +1,7 @@
 // popup.js
 
 const app = document.getElementById("app");
+const BACKEND_URL = "http://localhost:5000/api/analyze";
 
 function getRingColor(score) {
   if (score >= 9) return "#dc2626";
