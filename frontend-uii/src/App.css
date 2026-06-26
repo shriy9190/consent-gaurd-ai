@@ -1,72 +1,216 @@
 body {
-  margin: 0;
-  background: #0f172a;
-  font-family: Arial, sans-serif;
+
+margin:0;
+background:#020617;
+font-family:Inter,Arial,sans-serif;
+
 }
+
 
 .popup {
-  width: 350px;
-  margin: 30px auto;
-  background: #1e293b;
-  border-radius: 20px;
-  padding: 20px;
-  color: white;
+
+width:360px;
+min-height:520px;
+
+margin:auto;
+
+padding:20px;
+
+background:#0f172a;
+
+color:white;
+
+border-radius:25px;
+
+box-shadow:
+0 20px 40px rgba(0,0,0,.4);
+
 }
+
+
+
 
 .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+
 }
+
+
+.header h2 {
+
+font-size:18px;
+
+}
+
+
 
 .active {
-  color: #22c55e;
-  font-size: 12px;
+
+font-size:12px;
+color:#22c55e;
+
 }
+
+
+
 
 .risk-section {
-  text-align: center;
-  margin-top: 20px;
+
+text-align:center;
+margin-top:20px;
+
 }
+
+
 
 .risk-circle {
-  width: 150px;
-  height: 150px;
-  margin: 20px auto;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 34px;
-  font-weight: bold;
-  color: white;
 
-  background: conic-gradient(
-    #22c55e 0deg 120deg,
-    #facc15 120deg 240deg,
-    #ef4444 240deg 360deg
-  );
+width:150px;
+height:150px;
 
-  box-shadow:
-      0 0 30px rgba(239,68,68,.4);
+margin:15px auto;
+
+border-radius:50%;
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+
+background:#ef4444;
+
+box-shadow:
+0 0 35px rgba(239,68,68,.5);
+
 }
 
-.risks,
+
+
+.risk-circle strong {
+
+font-size:40px;
+
+}
+
+
+.risk-circle small {
+
+font-size:18px;
+
+}
+
+
+
+.SAFE .risk-circle {
+
+background:#22c55e;
+
+}
+
+
+.CAUTION .risk-circle {
+
+background:#eab308;
+
+}
+
+
+
+.tabs {
+
+display:flex;
+gap:10px;
+margin:20px 0;
+
+}
+
+
+.tabs button {
+
+flex:1;
+
+border:none;
+
+padding:10px;
+
+border-radius:12px;
+
+background:#1e293b;
+
+color:white;
+
+}
+
+
+
+.selected {
+
+background:#3b82f6 !important;
+
+}
+
+
+
+
+.card {
+
+background:#1e293b;
+
+padding:15px;
+
+border-radius:18px;
+
+line-height:1.5;
+
+}
+
+
+
+
 .recommendation {
-  background: #334155;
-  padding: 15px;
-  border-radius: 12px;
-  margin-top: 15px;
+
+margin-top:15px;
+
+padding:15px;
+
+border-radius:18px;
+
+background:#172554;
+
 }
 
-button {
-  width: 100%;
-  margin-top: 20px;
-  padding: 12px;
-  border: none;
-  border-radius: 12px;
-  background: #3b82f6;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
+
+
+.recommendation p {
+
+font-size:14px;
+
+}
+
+
+
+
+.main-btn {
+
+margin-top:20px;
+
+width:100%;
+
+padding:14px;
+
+border:none;
+
+border-radius:15px;
+
+background:#3b82f6;
+
+color:white;
+
+font-weight:bold;
+
+font-size:15px;
+
 }
