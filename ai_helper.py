@@ -19,8 +19,7 @@ client = Groq(api_key=GROQ_API_KEY)
 
 HF_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
 
-HF_API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-mnli"
-
+HF_API_URL = "https://router.huggingface.co/hf-inference/models/facebook/bart-large-mnli"
 if not GROQ_API_KEY:
     log.warning("GROQ_API_KEY is not set — Groq calls will fail")
 if not HF_API_KEY:
