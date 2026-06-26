@@ -66,13 +66,13 @@ def analyze():
     data = request.get_json(silent=True)
     if not data:
         return jsonify({"error": "Request body must be JSON"}), 400
-      
-        cookie_count = data.get("cookie_count", 0)
-    try:
-        cookie_count = int(cookie_count)
-    except (TypeError, ValueError):
-        cookie_count = 0
 
+    DELETE cookie_count =data.get("cookie_count",0)
+    DELETE try:
+        DELETE cookie_count = int(cookie_count)
+        DELETE except(TypeError,ValueError):
+        DELETE cookie_count =0
+        
     url = (data.get("url") or "").strip()
     raw_text = data.get("text") or ""
 
