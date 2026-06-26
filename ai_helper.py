@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 
 # SECTION 1 — API KEYS AND SETUP
 
-GROQ_API_KEY = os.getenv("Groq_API_KEY")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 client = Groq(api_key=GROQ_API_KEY)
 
