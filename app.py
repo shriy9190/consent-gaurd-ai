@@ -63,15 +63,15 @@ def analyze():
         return jsonify({"error": "Unauthorized"}), 401
 
     # ── Step 1: Parse and validate the request body ──────
-    cookie_count = data.get("cookie_count", 0)
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({"error": "Request body must be JSON"}), 400
+      
+        cookie_count = data.get("cookie_count", 0)
     try:
         cookie_count = int(cookie_count)
     except (TypeError, ValueError):
         cookie_count = 0
-    
-    data = request.get_json(silent=True)
-    if not data:
-        return jsonify({"error": "Request body must be JSON"}), 400
 
     url = (data.get("url") or "").strip()
     raw_text = data.get("text") or ""
