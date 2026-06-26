@@ -1,4 +1,3 @@
-
 import os        
 import json       
 import re          
@@ -16,15 +15,11 @@ log = logging.getLogger(__name__)
 
 GROQ_API_KEY = os.getenv("Groq_API_KEY")
 
-
 client = Groq(api_key=GROQ_API_KEY)
-
 
 HF_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
 
-
 HF_API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-mnli"
-
 
 if not GROQ_API_KEY:
     log.warning("GROQ_API_KEY is not set — Groq calls will fail")
@@ -32,6 +27,8 @@ if not HF_API_KEY:
     log.warning("HUGGINGFACE_API_KEY is not set — HuggingFace calls will fail")
 
 
+
+# SECTION 2 — RISK CATEGORIES AND SCORE LABELS
 
 RISK_CATEGORIES = {
     "selling user data"  : 2.0,  
@@ -44,7 +41,7 @@ RISK_CATEGORIES = {
     "security practices" : 0.8,  
     "cookies"            : 0.6,  
     "irrelevant"         : 0.0,  
-
+}  # ✅ closing brace was missing
 
 
 SCORE_LABELS = [
@@ -59,8 +56,6 @@ SCORE_LABELS = [
 # SECTION 3 — TEXT CLEANING AND SENTENCE SPLITTING
 
 def clean_text(text):
- 
-
     text = re.sub(r"<[^>]+>", " ", text)      
     text = re.sub(r"https?://\S+", "", text)   
     text = re.sub(r"\s+", " ", text)           
@@ -69,34 +64,25 @@ def clean_text(text):
 
 
 def split_into_sentences(text):
-   
     sentences = re.split(r'(?<=[.!?])\s+(?=[A-Z])', text)
-
-   
     sentences = [s.strip() for s in sentences if len(s.strip()) > 20]
-
     return sentences
 
 
 # SECTION 4 — HUGGINGFACE BERT (THE HIGHLIGHTER)
 
-
-
-MAX_SENTENCES_TO_CHECK = 200  
-HF_RETRY_ON_COLD_START = 1     
+MAX_SENTENCES_TO_CHECK    = 200  
+HF_RETRY_ON_COLD_START    = 1     
 HF_COLD_START_WAIT_SECONDS = 4
 
 
 def classify_one_sentence(sentence, _retries=HF_RETRY_ON_COLD_START):
-   
     headers = {"Authorization": f"Bearer {HF_API_KEY}"}
     payload = {
         "inputs": sentence,
         "parameters": {
             "candidate_labels": list(RISK_CATEGORIES.keys()),
-            
             "multi_label": False
-            
         }
     }
 
@@ -108,37 +94,30 @@ def classify_one_sentence(sentence, _retries=HF_RETRY_ON_COLD_START):
             timeout=15  
         )
 
-       
         if response.status_code == 503 and _retries > 0:
             time.sleep(HF_COLD_START_WAIT_SECONDS)
             return classify_one_sentence(sentence, _retries=_retries - 1)
 
         result = response.json()
 
-      
         if not isinstance(result, dict) or "labels" not in result:
             log.warning(f"Unexpected HF response, skipping sentence: {result}")
             return "irrelevant", 0.0
 
-      
         best_label = result["labels"][0]
         best_score = result["scores"][0]
 
         return best_label, best_score
 
     except Exception as error:
-       
         log.warning(f"BERT classification failed for one sentence: {error}")
         return "irrelevant", 0.0
 
 
 def find_important_sentences(text):
-  
-
     sentences = split_into_sentences(text)
     log.info(f"Total sentences found: {len(sentences)}")
 
-   
     if len(sentences) > MAX_SENTENCES_TO_CHECK:
         log.info(
             f"Capping at {MAX_SENTENCES_TO_CHECK} sentences "
@@ -150,21 +129,16 @@ def find_important_sentences(text):
     found_categories    = {}  
 
     for sentence in sentences:
-       
         category, confidence = classify_one_sentence(sentence)
 
-        
         if category == "irrelevant":
             continue
 
-       
         if confidence < 0.50:
             continue
 
-        
         important_sentences.append(sentence)
 
-       
         if category not in found_categories:
             found_categories[category] = []
         found_categories[category].append(sentence)
@@ -176,29 +150,21 @@ def find_important_sentences(text):
 # SECTION 5 — RISK SCORE CALCULATOR
 
 def calculate_risk_score(found_categories):
-  
     if not found_categories:
         return 1  
     total_weight = 0.0
 
     for category, sentences in found_categories.items():
-       
         weight = RISK_CATEGORIES.get(category, 0.0)
-
-       
         total_weight += weight
-
-    
         if len(sentences) > 2:
             total_weight += weight * 0.2  # add 20% extra
 
-    
     score = min(10, round(1 + (total_weight * 1.1)))
     return max(1, score)
 
 
 def get_risk_label(score):
-   
     for low, high, label in SCORE_LABELS:
         if low <= score <= high:
             return label
@@ -207,7 +173,6 @@ def get_risk_label(score):
 
 
 # SECTION 6 — GROQ LLM (THE EXPLAINER)
-
 
 SYSTEM_PROMPT = """You are a privacy expert who explains legal text 
 in simple plain English that a teenager can understand.
@@ -231,13 +196,9 @@ def ask_gpt_to_explain(important_sentences, found_categories):
             "positive_points": ["No major privacy concerns detected"]
         }
 
-   
-    bullet_list = "\n".join([f"- {s}" for s in important_sentences[:30]])
-   
-    
+    bullet_list    = "\n".join([f"- {s}" for s in important_sentences[:30]])
     category_names = list(found_categories.keys())
 
-    
     user_message = f"""Here are the most important sentences from a privacy policy.
 Risk categories detected by our AI: {', '.join(category_names)}
 
@@ -280,18 +241,15 @@ Important rules:
     except Exception as error:
         raise RuntimeError(f"Groq API call failed: {error}")
 
-
-    raw_reply = response.choices[0].message.content.strip()
-
-    
+    raw_reply   = response.choices[0].message.content.strip()
     clean_reply = re.sub(r"```(?:json)?|```", "", raw_reply).strip()
 
-    
     try:
         parsed = json.loads(clean_reply)
     except json.JSONDecodeError as error:
         log.error(f"Groq returned bad JSON: {raw_reply}")
         raise RuntimeError(f"Could not parse Groq response: {error}")
+
     parsed.setdefault("summary", "")
     parsed.setdefault("flags", [])
     parsed.setdefault("categories", {})
@@ -305,33 +263,22 @@ Important rules:
 # SECTION 7 — MAIN FUNCTION (called by app.py)
 
 def analyze_policy(raw_text):
-  
     if not raw_text or not raw_text.strip():
         raise ValueError("No policy text was provided")
 
-    # ── Step 1: Clean the text ────────────────────────────
-    
     log.info("Step 1: Cleaning text...")
     text = clean_text(raw_text)
     log.info(f"Text length after cleaning: {len(text)} characters")
 
-    # ── Step 2: BERT finds the important sentences ────────
-    
     log.info("Step 2: Running HuggingFace BERT to find risky sentences...")
     important_sentences, found_categories = find_important_sentences(text)
 
-    # ── Step 3: Groq explains in plain English ────────────
-    
     log.info("Step 3: Running Groq to explain findings...")
     gpt_result = ask_gpt_to_explain(important_sentences, found_categories)
 
-    # ── Step 4: Calculate the risk score ─────────────────
-    
     score = calculate_risk_score(found_categories)
     level = get_risk_label(score)
 
-    # ── Step 5: Build the final result dict ───────────────
-   
     result = {
         "score"          : score,
         "level"          : level,
