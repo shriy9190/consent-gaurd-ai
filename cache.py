@@ -5,7 +5,7 @@ import hashlib
 import os
 from datetime import datetime
 
-DBpath = os.getenv("chroma_db_path", "./.chroma_db")
+DBpath = os.getenv("CHROMA_DB_PATH", "./.chroma_db")
 
 _client = None
 _collection = None
