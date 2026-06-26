@@ -88,12 +88,23 @@ const analyzePolicy = async () => {
         <p>Privacy Risk Score</p>
 
 
-        <div className="risk-circle">
+       <div className="risk-circle">
 
-          <strong>{data.score}</strong>
-          <small>/10</small>
+  <span className="num n1">1</span>
+  <span className="num n2">2</span>
+  <span className="num n3">3</span>
+  <span className="num n4">4</span>
+  <span className="num n5">5</span>
+  <span className="num n6">6</span>
+  <span className="num n7">7</span>
+  <span className="num n8">8</span>
+  <span className="num n9">9</span>
+  <span className="num n10">10</span>
 
-        </div>
+  <strong>{data.score}</strong>
+  <small>/10</small>
+
+</div>
 
 
         <h3>{risk}</h3>

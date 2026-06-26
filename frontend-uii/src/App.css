@@ -68,30 +68,65 @@ margin-top:20px;
 
 .risk-circle {
 
-width:150px;
-height:150px;
+width:170px;
+height:170px;
 
-margin:15px auto;
+margin:20px auto;
 
 border-radius:50%;
+
+position:relative;
 
 display:flex;
 justify-content:center;
 align-items:center;
 
-
-background:#ef4444;
+background:
+conic-gradient(
+#22c55e 0deg 108deg,
+#eab308 108deg 216deg,
+#ef4444 216deg 360deg
+);
 
 box-shadow:
-0 0 35px rgba(239,68,68,.5);
+0 0 25px #22c55e,
+0 0 50px rgba(239,68,68,0.3);
+
+}
+
+
+.risk-circle::before {
+
+content:"";
+
+position:absolute;
+
+width:125px;
+height:125px;
+
+background:#020617;
+
+border-radius:50%;
+
+box-shadow:
+inset 0 0 20px #0ea5e9;
 
 }
 
 
 
+.risk-circle strong,
+.risk-circle small {
+
+position:relative;
+z-index:2;
+
+}
+
+
 .risk-circle strong {
 
-font-size:40px;
+font-size:42px;
 
 }
 
@@ -104,16 +139,51 @@ font-size:18px;
 
 
 
+.num {
+
+position:absolute;
+
+font-size:12px;
+color:white;
+z-index:3;
+
+}
+
+
+.n1 {top:5px; left:80px;}
+.n2 {top:20px; right:35px;}
+.n3 {top:55px; right:10px;}
+.n4 {bottom:55px; right:10px;}
+.n5 {bottom:20px; right:35px;}
+.n6 {bottom:5px; left:80px;}
+.n7 {bottom:20px; left:35px;}
+.n8 {bottom:55px; left:10px;}
+.n9 {top:55px; left:10px;}
+.n10 {top:20px; left:35px;}
+
+
+
+
 .SAFE .risk-circle {
 
-background:#22c55e;
+box-shadow:
+0 0 30px #22c55e;
 
 }
 
 
 .CAUTION .risk-circle {
 
-background:#eab308;
+box-shadow:
+0 0 30px #eab308;
+
+}
+
+
+.HIGH .risk-circle {
+
+box-shadow:
+0 0 35px #ef4444;
 
 }
 
