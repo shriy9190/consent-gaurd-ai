@@ -5,13 +5,61 @@ function App() {
 
   const [tab, setTab] = useState("summary");
 
-  const riskScore = 8;
+  const [data, setData] = useState({
+  score: 8,
+
+  summary:
+  "This website requests your location, may share data with third parties, and stores information for a long time.",
+
+  risks: [
+    "Location Tracking",
+    "Third-Party Sharing",
+    "Long-Term Data Storage"
+  ]
+});
+const analyzePolicy = async () => {
+
+  try {
+
+    const response = await fetch(
+      "http://localhost:5000/api/analyze",
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body: JSON.stringify({
+          text:"Sample privacy policy text"
+        })
+      }
+    );
+
+
+    const result = await response.json();
+
+
+    setData({
+      score: result.score,
+      summary: result.summary,
+      risks: result.risks
+    });
+
+
+  } catch(error){
+
+    console.log(error);
+
+  }
+
+};
 
 
   const risk =
-    riskScore <= 3
+    data.score <= 3
       ? "SAFE"
-      : riskScore <= 6
+      : data.score <= 6
       ? "CAUTION"
       : "HIGH RISK";
 
@@ -42,7 +90,7 @@ function App() {
 
         <div className="risk-circle">
 
-          <strong>{riskScore}</strong>
+          <strong>{data.score}</strong>
           <small>/10</small>
 
         </div>
@@ -88,9 +136,7 @@ function App() {
           <h4>🧠 AI Summary</h4>
 
           <p>
-          This website requests your location,
-          may share data with third parties,
-          and stores information for a long time.
+          {data.summary}
           </p>
           </>
 
@@ -100,10 +146,13 @@ function App() {
           <>
           <h4>⚠ Detected Issues</h4>
 
-          <p>⚠ Location Tracking</p>
-          <p>⚠ Third-Party Sharing</p>
-          <p>⚠ Long-Term Data Storage</p>
-
+          {
+data.risks.map((item,index)=>(
+<p key={index}>
+⚠ {item}
+</p>
+))
+}
           </>
 
         )
@@ -129,6 +178,9 @@ function App() {
 
 
 
+      <button onClick={analyzePolicy} className="main-btn">
+  Scan Policy
+</button>
       <button className="main-btn">
         View Full Report
       </button>
