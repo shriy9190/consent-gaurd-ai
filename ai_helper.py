@@ -99,13 +99,15 @@ def classify_one_sentence(sentence, _retries=HF_RETRY_ON_COLD_START):
 
         result = response.json()
 
-        if not isinstance(result, dict) or "labels" not in result:
+        if isinstance(result, list) and result and "label" in result [0]:
+            best_label =result[0]["label"]
+            best_score =result[0]["score"]
+        elif isinstance( result , dict) and "labels" in result:
+            best_label = result["labels"][0]
+            best_score =result["scores"][0]
+        else:
             log.warning(f"Unexpected HF response, skipping sentence: {result}")
             return "irrelevant", 0.0
-
-        best_label = result["labels"][0]
-        best_score = result["scores"][0]
-
         return best_label, best_score
 
     except Exception as error:
