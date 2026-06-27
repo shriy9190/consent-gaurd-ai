@@ -1,4 +1,4 @@
-from chromadb.config import Settings   # ✅ capital S
+from chromadb.config import Settings   
 import chromadb
 import json
 import hashlib
@@ -16,13 +16,12 @@ def _get_collection():
     global _client, _collection
     if _collection is not None:
         return _collection
-    os.makedirs(DBpath, exist_ok=True)
-    _client = chromadb.PersistentClient(
-        path=DBpath,
-        settings=Settings(anonymized_telemetry=False)  # ✅ capital S
+   
+    _client = chromadb.EphemeralClient(
+        settings=Settings(anonymized_telemetry=False)
     )
     _collection = _client.get_or_create_collection("policy_cache")
-    print(f"chromadb connected - saving data at: {DBpath}")
+    print("ChromaDB connected using Free In-Memory Storage Engine.")
     return _collection
 
 
