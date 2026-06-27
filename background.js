@@ -69,9 +69,9 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ url: found.policyUrl, text: found.text })
     });
-    const data = await res.json();
-    chrome.storage.local.set({ [cacheKey]: { status: "done", result: data, policyUrl: found.policyUrl } });
-    updateBadge(tabId, String(data.score), getBadgeColor(data.score));
+  const data = await res.json();
+chrome.storage.local.set({ [cacheKey]: { status: "done", result: data, policyUrl: found.policyUrl } });
+updateBadge(tabId, String(data.score), getBadgeColor(data.score));
   } catch (err) {
     console.error("ConsentGuard error:", err);
     chrome.storage.local.set({ [cacheKey]: { status: "error" } });
