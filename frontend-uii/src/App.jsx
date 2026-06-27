@@ -9,23 +9,27 @@ function App() {
     summary:
       "This website requests your location, may share data with third parties, and stores information for a long time.",
     risks: [
-      "Location Tracking",
-      "Third-Party Sharing",
-      "Long-Term Data Storage",
+      "Privacy Risk Flag",
+      "Data Collection",
+      "Data Sharing",
+      "User Rights",
     ],
   });
 
   const analyzePolicy = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/analyze", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          text: "Sample privacy policy text",
-        }),
-      });
+      const response = await fetch(
+        "http://localhost:5000/api/analyze",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            text: "Sample privacy policy text",
+          }),
+        }
+      );
 
       const result = await response.json();
 
@@ -43,151 +47,168 @@ function App() {
     data.score <= 3
       ? "SAFE"
       : data.score <= 6
-      ? "CAUTION"
-      : "HIGH RISK";
+      ? "MEDIUM"
+      : "HIGH DANGER";
 
-  const progress = `${data.score * 10}%`;
+  const ringColor =
+    data.score <= 3
+      ? "#22c55e"
+      : data.score <= 6
+      ? "#facc15"
+      : "#ff3b6b";
 
   return (
     <div className="popup">
 
-      <div className="header">
+  {/* HEADER */}
 
-  <div>
-
-    <h1>CONSENTGUARD AI</h1>
-
-    <p className="subtitle">
-      Privacy Intelligence Engine
-    </p>
-
-  </div>
-
-  <div className="status">
-
-    <span className="dot"></span>
+  <div className="header">
 
     <div>
 
-      <span className="status-title">
-        SECURE
-      </span>
-
-      <small>
-        Scan Active
-      </small>
+      <h1>
+        <span className="logo">🛡</span>
+        ConsentGuard-<span className="blue">AI</span>
+      </h1>
 
     </div>
 
+    <button className="setting-btn">
+      ⚙
+    </button>
+
   </div>
 
-</div>
+  {/* WEBSITE */}
 
-      <hr />
+  <div className="website">
 
-      <div className="threat">
+    <span className="website-dot"></span>
 
-  <p className="section-title">THREAT LEVEL</p>
+    <span>
+      www.cookieserve.com
+    </span>
 
-  <h2>{data.score}/10</h2>
-
-  <div className="confidence">
-    AI Confidence 96%
   </div>
 
-  <div className="threat-bar">
-    {[1,2,3,4,5,6,7,8,9,10].map((n) => (
-      <div
-        key={n}
-        className={`segment ${
-          n <= data.score
-            ? data.score <= 3
-              ? "green"
-              : data.score <= 6
-              ? "yellow"
-              : "red"
-            : ""
-        }`}
-      ></div>
-    ))}
-  </div>
+  {/* RISK METER */}
 
-  <div className="risk-text">{risk}</div>
+  <div className="meter-section">
 
-  <div className="extra-info">
-    <span>Privacy Score: {data.score}/10</span>
-    <span>Tracking Level: {data.score >= 7 ? "Severe" : data.score >= 4 ? "Moderate" : "Low"}</span>
-  </div>
+    <div className={`meter ${
+      data.score <= 3
+        ? "green"
+        : data.score <= 6
+        ? "yellow"
+        : "red"
+    }`}>
 
-</div>
+      <div className="meter-inner">
 
-      <div className="tabs">
-
-        <button
-          className={tab === "summary" ? "selected" : ""}
-          onClick={() => setTab("summary")}
-        >
-          Summary
-        </button>
-
-        <button
-          className={tab === "risk" ? "selected" : ""}
-          onClick={() => setTab("risk")}
-        >
-          Risks
-        </button>
+        <h2>
+          {data.score}
+          <small>/10</small>
+        </h2>
 
       </div>
 
-      <div className="card">
+    </div>
 
-        {tab === "summary" ? (
-          <>
-            <h3>🧠 AI SUMMARY</h3>
+    <div className="danger-pill">
+  {data.score <= 3
+    ? "SAFE"
+    : data.score <= 6
+    ? "MEDIUM"
+    : "HIGH DANGER"}
+</div>
+
+</div>
+
+{/* TABS */}
+
+<div className="tabs">
+
+  <button
+    className={tab === "summary" ? "selected" : ""}
+    onClick={() => setTab("summary")}
+  >
+    Smart Summary
+  </button>
+
+  <button
+    className={tab === "risk" ? "selected" : ""}
+    onClick={() => setTab("risk")}
+  >
+    Critical Flags
+  </button>
+
+</div>
+
+{tab === "summary" ? (
+
+<div className="card">
+
+<h3>SMART SUMMARY</h3>
 
 <p>{data.summary}</p>
 
-<hr className="mini"/>
+</div>
 
-<div className="meta">
+) : (
+
+<div className="card">
+
+<h3>CRITICAL FLAGS</h3>
+
+{data.risks.map((item,index)=>(
+
+<div className="flag" key={index}>
+
+<span>{item}</span>
+
+<span className="badge">
+
+HIGH
+
+</span>
+
+</div>
+
+))}
+
+</div>
+
+)}
+
+<div className="card">
+
+<h3>PERMISSION INSIGHTS</h3>
+
+<div className="permission">
 
 <div>
 
-<strong>Detected</strong>
+<strong>Essential Cookies</strong>
 
-<p>3 Privacy Issues</p>
-
-</div>
-
-<div>
-
-<strong>Confidence</strong>
-
-<p>96%</p>
+<p>
+Required to manage secure browser state.
+</p>
 
 </div>
 
+<span className="required">
+REQUIRED
+</span>
+
 </div>
-          </>
-        ) : (
-          <>
-            <h3>SECURITY FLAGS</h3>
 
-            {data.risks.map((risk, index) => (
-              <div className="risk-item" key={index}>
-                ⚠ {risk}
-              </div>
-            ))}
-          </>
-        )}
+</div>
 
-      </div>
+<div className="card">
 
-      <div className="recommendation">
+<h3>ACTIONABLE SAFEGUARDS</h3>
 
-        <h3>RECOMMENDED ACTION</h3>
-
-        <div className="actions">
+<div className="actions">
 
 <p>✓ Reject optional cookies</p>
 
@@ -195,22 +216,26 @@ function App() {
 
 <p>✓ Block third-party tracking</p>
 
-<p>✓ Review permissions before accepting</p>
+<p>✓ Review permissions</p>
 
 </div>
 
-      </div>
+</div>
 
-      <button className="scan-btn" onClick={analyzePolicy}>
-        Scan Policy →
-      </button>
+<div className="classification">
 
-      <button className="report-btn">
-        View Full Report →
-      </button>
+<strong>Classification: CRITICAL</strong>
 
-    </div>
-  );
+<p>
+
+Potential GDPR concerns detected due to excessive data collection.
+
+</p>
+
+</div>
+
+</div>
+);
 }
 
 export default App;
