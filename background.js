@@ -1,7 +1,7 @@
 // ConsentGuard AI - background.js v2
 // Replace YOUR_RENDER_URL with your actual Render URL
 
-const BACKEND_URL = "https://consentguard-ai-dw7a.onrender.com/api/analyze"; // ← change to your Render URL
+const BACKEND_URL = "https://consentguard-ai-dw7a.onrender.com"; // ← change to your Render URL
 
 function getRootDomain(url) {
   try { return new URL(url).hostname.replace(/^www\./, ""); }
