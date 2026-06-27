@@ -142,7 +142,7 @@ def method_not_allowed(error):
 
 @app.errorhandler(413)
 def payload_too_large(error):
-    return jsonify({"error": "Request body too large"})
+    return jsonify({"error": "Request body too large"}) , 413
 
 if __name__ == "__main__":
     
