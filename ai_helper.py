@@ -77,10 +77,10 @@ HF_COLD_START_WAIT_SECONDS = 4
 
 def classify_one_sentence(sentence, _retries=HF_RETRY_ON_COLD_START):
     headers = {"Authorization": f"Bearer {HF_API_KEY}"}
-   truncated_text = text[:3500]
+   truncated_text = sentence[:3500]
     payload = {
         "inputs": truncated_text,
-        "parameters": {"candidate_labels": list(RISK_CATEGORIES.keys())}
+        "parameters": {"candidate_labels": list(RISK_CATEGORIES.keys()),
             "multi_label": False
         }
     }
