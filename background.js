@@ -66,7 +66,10 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   try {
     const res = await fetch(BACKEND_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json" 
+         "X-API-Key": "hackathon"
+      },
       body: JSON.stringify({ url: found.policyUrl, text: found.text })
     });
   const data = await res.json();
