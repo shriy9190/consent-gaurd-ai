@@ -82,15 +82,14 @@ def classify_one_sentence(sentence, _retries=HF_RETRY_ON_COLD_START):
         "inputs": truncated_text,
         "parameters": {"candidate_labels": list(RISK_CATEGORIES.keys()),
             "multi_label": False
-        }
-    }
-
+      }
+   }
     try:
         response = requests.post(
             HF_API_URL,
             headers=headers,
             json=payload,
-            timeout=15  
+            timeout=15
         )
 
         if response.status_code == 503 and _retries > 0:
