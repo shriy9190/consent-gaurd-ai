@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ConsentGuard-AI Dashboard</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="brand">
+      <span class="shield-icon">🛡️</span>
+      <h1 class="brand-title">ConsentGuard<span class="brand-accent">-AI</span></h1>
+    </div>
+    <button id="settings-btn" class="icon-btn" title="Settings">⚙️</button>
+  </header>
+
+  <!-- Main Dashboard Container -->
+  <main class="app-main">
+    <!-- Active Site Identifier -->
+    <div class="site-badge-container">
+      <span class="dot"></span>
+      <span id="site-domain" class="site-domain">Scanning page...</span>
+    </div>
+
+    <!-- View: Dashboard -->
+    <section id="dashboard-view" class="view active">
+      <!-- Circular Risk Score Meter -->
+      <div class="risk-meter-container">
+        <div class="risk-circle">
+          <svg class="progress-ring" width="120" height="120">
+            <circle class="progress-ring__background" stroke="rgba(255,255,255,0.05)" stroke-width="8" fill="transparent" r="50" cx="60" cy="60"/>
+            <circle id="risk-progress" class="progress-ring__circle" stroke="#10b981" stroke-width="8" stroke-dasharray="314.16" stroke-dashoffset="314.16" stroke-linecap="round" fill="transparent" r="50" cx="60" cy="60"/>
+          </svg>
+          <div class="risk-value-wrapper">
+            <span id="risk-score" class="risk-score">0</span>
+            <span class="risk-max">/10</span>
+          </div>
+        </div>
+        <div class="risk-label-container">
+          <span id="risk-level" class="risk-level-badge level-safe">Awaiting Scan</span>
+        </div>
+      </div>
+
+      <!-- Smart Summary Section -->
+      <div class="card card-summary">
+        <h3 class="card-title">💡 Smart Summary</h3>
+        <p id="smart-summary-text" class="summary-text">
+          Navigate to a webpage containing a privacy policy, terms of service, or a cookie banner to analyze its threat level.
+        </p>
+      </div>
+
+      <!-- Critical Flags Accordion -->
+      <div class="card card-flags">
+        <h3 class="card-title">🚨 Critical Flags</h3>
+        <div id="flags-list" class="flags-list">
+          <div class="empty-state">No active scans yet.</div>
+        </div>
+      </div>
+
+      <!-- Permission Insights Section -->
+      <div class="card card-permissions">
+        <h3 class="card-title">🔑 Permission Insights</h3>
+        <div id="permissions-list" class="permissions-list">
+          <div class="empty-state">No permissions analyzed.</div>
+        </div>
+      </div>
+
+      <!-- Recommendations Section -->
+      <div class="card card-recommendations">
+        <h3 class="card-title">🛡️ Actionable Safeguards</h3>
+        <ul id="recommendations-list" class="recommendations-list">
+          <div class="empty-state">No recommendation available.</div>
+        </ul>
+      </div>
+
+      <!-- Regulatory Context Tag -->
+      <div id="regulatory-container" class="regulatory-container hidden">
+        <span class="law-icon">⚖️</span>
+        <span id="regulatory-text" class="regulatory-text">GDPR / CCPA Applicable</span>
+      </div>
+
+      <!-- Interceptor Actions (Hidden by default) -->
+      <div id="interceptor-actions" style="display: none; margin-top: 15px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+        <p style="margin-bottom: 10px; font-size: 0.9em; color: #a1a1aa;">This page has been intercepted before loading.</p>
+        <button id="btn-interceptor-back" style="background: #374151; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-right: 10px; font-weight: 500;">Go Back (Safe)</button>
+        <button id="btn-interceptor-proceed" style="background: transparent; color: #ef4444; border: 1px solid #ef4444; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 500;">Proceed Anyway</button>
+        <div style="margin-top: 12px; font-size: 0.85em; color: #a1a1aa;">
+          <input type="checkbox" id="interceptor-allow-checkbox" style="vertical-align: middle;">
+          <label for="interceptor-allow-checkbox" style="vertical-align: middle;">Always allow this site</label>
+        </div>
+      </div>
+    </section>
+
+    <!-- View: Settings -->
+    <section id="settings-view" class="view">
+      <div class="settings-header">
+        <h2>Extension Configurations</h2>
+        <button id="back-btn" class="text-btn">← Dashboard</button>
+      </div>
+
+      <div class="settings-form">
+        <!-- Backend Server Config -->
+        <div class="form-group">
+          <label for="backend-url-input">Flask Server URL</label>
+          <input type="text" id="backend-url-input" placeholder="http://127.0.0.1:5001" class="form-input">
+          <span class="help-text">Redirects analysis queries to your Flask server backend. If empty, the extension runs local analysis.</span>
+        </div>
+
+        <!-- API Setup -->
+        <div class="form-group">
+          <label for="api-key-input">Gemini API Key (Optional)</label>
+          <input type="password" id="api-key-input" placeholder="AIzaSy..." class="form-input">
+          <span class="help-text">Used for direct in-browser Gemini calls if not using a Flask server backend.</span>
+        </div>
+
+        <!-- Custom Prompts or Settings -->
+        <div class="form-group">
+          <label for="threshold-slider">Risk Intercept Threshold</label>
+          <div class="slider-wrapper">
+            <input type="range" id="threshold-slider" min="1" max="10" value="5" class="form-slider">
+            <span id="threshold-value" class="slider-value">5</span>
+          </div>
+          <span class="help-text">Intercept button clicks when the analyzed risk score is equal to or higher than this value.</span>
+        </div>
+
+        <div class="form-group row">
+          <label for="simulator-toggle" class="toggle-label">Use Local Simulation</label>
+          <label class="switch">
+            <input type="checkbox" id="simulator-toggle" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <span class="help-text block">Runs a fast local pattern checker for risk evaluation when API Key is not set or for instant loading.</span>
+
+        <!-- Save Button -->
+        <button id="save-settings-btn" class="primary-btn">Save Configurations</button>
+        <div id="save-status" class="save-status">Settings saved!</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Script Reference -->
+  <script src="popup.js"></script>
+</body>
+</html>

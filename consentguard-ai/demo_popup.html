@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ConsentGuard AI - Popup Demo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Simulated extension float card -->
+  <div class="demo-container">
+    
+    <!-- Top Mode Switcher -->
+    <div class="mode-toggle">
+      <button id="btn-mode-policy" class="toggle-btn active">Policy Analysis</button>
+      <button id="btn-mode-intercept" class="toggle-btn">Permission Alert</button>
+    </div>
+
+    <!-- Header (Dynamic content changes depending on active screen) -->
+    <div class="header">
+      <div class="brand">
+        <span class="brand-icon">🛡️</span>
+        <span class="brand-name">ConsentGuard AI</span>
+      </div>
+      <span id="header-website" class="website-url">facebook.com</span>
+    </div>
+
+    <!-- SCREEN 1: Privacy Policy Score -->
+    <div id="panel-policy" class="content-panel active">
+      
+      <div class="score-section">
+        <div class="risk-meter">
+          <!-- SVG Progress Ring: C = 2 * PI * r = 2 * 3.14159 * 40 = 251.2 -->
+          <svg class="progress-ring" width="90" height="90">
+            <circle class="progress-ring__background" stroke="rgba(255,255,255,0.05)" stroke-width="6" fill="transparent" r="40" cx="45" cy="45"/>
+            <!-- 78% score: dashoffset = 251.2 - (78 / 100) * 251.2 = 55.26 -->
+            <circle id="progress-bar" class="progress-ring__circle" stroke="#ff4444" stroke-width="6" stroke-dasharray="251.2" stroke-dashoffset="55.26" stroke-linecap="round" fill="transparent" r="40" cx="45" cy="45"/>
+          </svg>
+          <div class="score-text-wrapper">
+            <span class="score-value">78</span>
+            <span class="score-max">/100</span>
+          </div>
+        </div>
+        
+        <div class="risk-info">
+          <div>
+            <span class="risk-badge">High Risk</span>
+          </div>
+          <span class="risk-status-desc">Significant overreach detected</span>
+        </div>
+      </div>
+
+      <div class="section-title">Permission Audits</div>
+      <div class="permissions-list">
+        <div class="permission-item">
+          <span class="permission-label">📍 Location</span>
+          <span class="permission-badge status-justified">Justified</span>
+        </div>
+        <div class="permission-item">
+          <span class="permission-label">📷 Camera</span>
+          <span class="permission-badge status-justified">Justified</span>
+        </div>
+        <div class="permission-item">
+          <span class="permission-label">🌐 Browsing history</span>
+          <span class="permission-badge status-unjustified">Unjustified</span>
+        </div>
+        <div class="permission-item">
+          <span class="permission-label">🤝 Third-party data sharing</span>
+          <span class="permission-badge status-unjustified">Unjustified</span>
+        </div>
+        <div class="permission-item">
+          <span class="permission-label">🎙️ Microphone always-on</span>
+          <span class="permission-badge status-unjustified">Unjustified</span>
+        </div>
+      </div>
+
+      <div class="section-title">Critical Flags</div>
+      <div class="flags-list">
+        <div class="flag-bullet">Vague "business partners" clause permits sharing telemetry profiles.</div>
+        <div class="flag-bullet">Continuous background microphone access requested without active calls.</div>
+      </div>
+
+      <div class="summary-box">
+        Facebook collects far more data than it needs. Browsing history tracking and vague third-party sharing clauses are major red flags.
+      </div>
+
+    </div>
+
+    <!-- SCREEN 2: Real-time Permission Intercept -->
+    <div id="panel-intercept" class="content-panel">
+      
+      <div class="intercept-container">
+        
+        <div class="verdict-badge">
+          <span>🔴</span> DENY
+        </div>
+
+        <div class="one-liner">
+          Google Meet doesn't need your location.
+        </div>
+
+        <div class="detail-box">
+          <div class="detail-title">What they can do with it</div>
+          <p class="detail-text">
+            With your location, they can track where you are in real time, log your movement patterns, and share it with ad partners.
+          </p>
+        </div>
+
+        <div class="alternative-box">
+          <div class="alternative-title">🛡️ Safer Alternative</div>
+          <p class="alternative-text">
+            You can manually select your time zone in settings. No location access needed.
+          </p>
+        </div>
+
+        <div class="action-buttons">
+          <button id="btn-intercept-deny" class="btn btn-deny">Deny (recommended)</button>
+          <button id="btn-intercept-allow" class="btn btn-allow">Allow anyway</button>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <span class="hackathon-tag">ConsentGuard AI • Live Demo Interface</span>
+
+  <script src="script.js"></script>
+</body>
+</html>

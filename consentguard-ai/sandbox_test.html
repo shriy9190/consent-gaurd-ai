@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ConsentGuard-AI Testing Sandbox</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+      background: #fafafa;
+      color: #333;
+      line-height: 1.6;
+    }
+    h1 {
+      color: #0f172a;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 12px;
+    }
+    .instructions {
+      background: #f1f5f9;
+      border-left: 4px solid #06b6d4;
+      padding: 16px;
+      border-radius: 4px;
+      margin-bottom: 30px;
+    }
+    .test-box {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    .btn {
+      background: #0284c7;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-right: 10px;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+    .btn:hover {
+      background: #0369a1;
+    }
+    .cookie-banner-sim {
+      border: 2px dashed #f59e0b;
+      background: #fffbeb;
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+    .privacy-sample {
+      font-size: 13px;
+      color: #64748b;
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 4px;
+      border: 1px solid #e2e8f0;
+      max-height: 150px;
+      overflow-y: auto;
+      margin-top: 10px;
+      font-family: monospace;
+    }
+    code {
+      background: #e2e8f0;
+      padding: 2px 5px;
+      border-radius: 3px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🛡️ ConsentGuard-AI Testing Sandbox</h1>
+  
+  <div class="instructions">
+    <h3>How to load and test the Extension in Chrome:</h3>
+    <ol>
+      <li>Open Google Chrome and navigate to <code>chrome://extensions/</code></li>
+      <li>Enable <strong>Developer mode</strong> using the toggle switch in the top-right corner.</li>
+      <li>Click <strong>Load unpacked</strong> in the top-left corner.</li>
+      <li>Select the folder: <code>C:\Users\user\.gemini\antigravity\scratch\consentguard-ai</code></li>
+      <li>Open this page (<code>sandbox_test.html</code>) in Chrome.</li>
+      <li>Click on any of the "Accept" buttons below to test click interception!</li>
+    </ol>
+  </div>
+
+  <!-- Scenario 1: Low Risk Cookie Consent -->
+  <div class="test-box">
+    <h2>Scenario 1: Standard/Low Risk Consent</h2>
+    <p>This banner contains standard language about analytics and session management, posing very minimal security threat.</p>
+    
+    <div id="cookie-banner-low" class="cookie-banner-sim">
+      <strong>Cookie Settings</strong>
+      <p>We use essential cookies to maintain your login status and shopping cart content. Analytical cookies help us optimize interface configurations.</p>
+      <button class="btn" onclick="alert('Consent Success! (Standard low risk, did not intercept)')">Accept</button>
+      <button class="btn" style="background:#64748b;">Decline</button>
+    </div>
+  </div>
+
+  <!-- Scenario 2: High Risk Consent (Data Selling & Background Tracking) -->
+  <div class="test-box">
+    <h2>Scenario 2: High-Risk Consent Interception</h2>
+    <p>This banner details commercial data exploitation: selling interest profiles to ad networks and monitoring geolocation parameters in the background. Clicking "Accept" should trigger the ConsentGuard-AI warning overlay modal before consenting!</p>
+    
+    <div id="cookie-banner-high" class="cookie-banner-sim" style="border-color:#ef4444; background:#fef2f2;">
+      <strong>⚠️ Privacy & Tracking Preferences</strong>
+      <p>By clicking Accept, you agree to share cross-site browsing telemetry, cellular geolocation triangulation logs, and advertising identifiers with our commercial sponsors and monetization partners to build personalized profiles.</p>
+      <button class="btn" style="background:#dc2626;" onclick="alert('Consent Success! (WARNING: You accepted a high-risk policy)')">Accept</button>
+      <button class="btn" style="background:#64748b;">Settings</button>
+    </div>
+  </div>
+
+  <!-- Mock Privacy Policy Link -->
+  <div class="test-box">
+    <h2>Scenario 3: Full Privacy Policy Page Analysis</h2>
+    <p>If you are on a policy page, clicking the extension icon in Chrome's toolbar opens the glassmorphism dashboard, displaying a comprehensive report.</p>
+    <p>Below is a sample of dense legal text matching high-risk profiles. The content script automatically scrapes this text for processing.</p>
+    
+    <div class="privacy-sample">
+      <h3>PRIVACY POLICY (SECTION 4.2: GEO-TRACKING & HARDWARE UTILIZATION)</h3>
+      <p>We collect device telemetry coordinates and GPS positioning vectors continuously to run backend localization optimizations. We disclose demographic, telemetry, and transactional summaries to promotional partners for the delivery of targeted messaging campaigns.</p>
+      <p>User profile information is archived inside active storage registers indefinitely and is not discarded upon account termination due to analytical requirements.</p>
+    </div>
+  </div>
+</body>
+</html>
