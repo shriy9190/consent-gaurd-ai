@@ -96,10 +96,6 @@ python app.py
 | Bhavika Bhati | Frontend — Browser Extension & UI |
 | Shreya Singh | Integration, Testing & Demo |
 
----s
-# ConsentGuard AI 🛡️
-
-A Chrome extension that analyzes privacy policies in real-time and gives you a risk score before you click "Accept".
 
 ---
 
@@ -142,15 +138,6 @@ Since this extension isn't on the Chrome Web Store yet, follow these steps:
 | 4–5 | 🟡 Moderate | Read with caution |
 | 6–8 | 🟠 High | Significant concerns |
 | 9–10 | 🔴 Critical | Avoid if possible |
-
----
-
-## 🛠️ Tech Stack
-
-- Chrome Extension (Manifest V3)
-- Flask Backend
-- BERT + Groq Llama 3.3
-- ChromaDB
 
 ---
 
